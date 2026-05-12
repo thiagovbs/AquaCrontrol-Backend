@@ -62,6 +62,7 @@ enum Status {
   PAGO
   PENDENTE
   ATRASADO
+  FATURADO
 }
 
 model Configuracao {
