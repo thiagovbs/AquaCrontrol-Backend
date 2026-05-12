@@ -7,8 +7,8 @@ const usuarioRoutes = require('./routes/usuarios');
 const leituraRoutes = require('./routes/leituras');
 const dashboardRoutes = require('./routes/dashboard');
 const configRoutes = require('./routes/config');
-const isAdmin = require('./middlewares/isAdmin');
-const auth = require('./middlewares/auth');
+const isAdmin = require('./middleware/isAdmin');
+const auth = require('./middleware/auth');
 
 const app = express();
 app.use(cors());
