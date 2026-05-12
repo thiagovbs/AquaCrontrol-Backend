@@ -21,7 +21,7 @@ Start Command: npm start
 
 Variáveis de Ambiente Necessárias:
 
-DATABASE_URL: String de conexão do Neon(base PostgreSQL).
+DATABASE_URL: String de conexão do Neon
 
 JWT_SECRET: Chave secreta para tokens.
 
