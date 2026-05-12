@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
         
         // Mantém a busca da última leitura
         leituras: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { criadoEm: 'desc' },
           take: 1
         }
       }
