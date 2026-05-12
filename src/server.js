@@ -6,6 +6,7 @@ const proprietarioRoutes = require('./routes/proprietarios');
 const usuarioRoutes = require('./routes/usuarios');
 const leituraRoutes = require('./routes/leituras');
 const dashboardRoutes = require('./routes/dashboard');
+const configRoutes = require('./routes/config');
 
 const app = express();
 app.use(cors());
@@ -17,6 +18,7 @@ app.use('/api/proprietarios', proprietarioRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/leituras', leituraRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/config', configRoutes);
 
 // Configuração do CORS para produção
 app.use(cors({
