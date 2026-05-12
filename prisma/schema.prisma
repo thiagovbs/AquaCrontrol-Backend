@@ -5,7 +5,6 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/client"
 }
 
 model User {
@@ -63,4 +62,9 @@ enum Status {
   PAGO
   PENDENTE
   ATRASADO
+}
+
+model Configuracao {
+  id               Int   @id @default(1)
+  valorMetroCubico Float @default(0.0)
 }
