@@ -5,13 +5,18 @@ const prisma = new PrismaClient();
 
 // Busca o valor atual (Sempre pega o ID 1)
 router.get('/', async (req, res) => {
+  console.log("=> Rota GET /api/config acessada");
   try {
+    console.log("=> Tentando buscar no banco...");
     let config = await prisma.configuracao.findUnique({ where: { id: 1 } });
+    console.log("=> Resultado do banco:", config);
     if (!config) {
+      console.log("=> Config não encontrada, criando padrão...");
       config = await prisma.configuracao.create({ data: { id: 1, valorMetroCubico: 0 } });
     }
     res.json(config);
   } catch (error) {
+    console.error("❌ ERRO FATAL NO PRISMA:", error.message);
     res.status(500).json({ error: 'Erro ao buscar configuração' });
   }
 });
