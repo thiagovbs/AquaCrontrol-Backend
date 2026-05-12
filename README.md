@@ -37,10 +37,9 @@ O Render aplicará automaticamente as mudanças no banco de produção via coman
 🚀 Como Rodar Localmente
   1. Clonar este repositório!
   2. Configurar o Backend:
-  3. Entre em cd backend.
+      
+       a) Crie um arquivo .env com sua DATABASE_URL na raiz do projeto.
      
-       a) Crie um arquivo .env com sua DATABASE_URL.
-     
-  5. Rode npm install.
-  6. Rode npx prisma migrate dev para sincronizar o banco local.
-  7. Inicie com npm run dev.
+  3. Rode npm install.
+  4. Rode npx prisma migrate dev para sincronizar o banco local.
+  5. Inicie com npm run dev.
