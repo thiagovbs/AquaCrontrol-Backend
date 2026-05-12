@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   console.log("=> Rota GET /api/config acessada");
   try {
     console.log("=> Tentando buscar no banco...");
-    const config = await prisma.configuracao.findUnique({ where: { id: 1 } });
+    let config = await prisma.configuracao.findUnique({ where: { id: 1 } });
     console.log("=> Resultado do banco:", config);
     if (!config) {
       console.log("=> Config não encontrada, criando padrão...");
