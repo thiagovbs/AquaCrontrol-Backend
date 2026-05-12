@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('../lib/prisma');
+const prisma = require('../lib/prisma');
 const prisma = new PrismaClient();
 
 // Busca o valor atual (Sempre pega o ID 1)
