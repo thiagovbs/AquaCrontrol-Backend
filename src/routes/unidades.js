@@ -4,15 +4,45 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Listar unidades com dados do proprietário
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const unidades = await prisma.unidade.findMany({
-      include: { proprietario: true }
+      include: {
+        // Busca os dados do proprietário relacionado
+        proprietario: true, 
+        
+        // Mantém a busca da última leitura
+        leituras: {
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        }
+      }
     });
-    res.json(unidades);
+
+    // Agora formatamos para enviar um objeto mais rico para o App/Web
+    const respostaFormatada = unidades.map(unidade => {
+      return {
+        id: unidade.id,
+        numero: unidade.numero,
+        bloco: unidade.bloco,
+        
+        // Dados da Leitura (como fizemos antes)
+        ultimaLeitura: unidade.leituras.length > 0 ? unidade.leituras[0].leituraAtual : 0,
+        
+        // Dados do Proprietário (objeto completo ou apenas o que você precisar)
+        proprietario: {
+          id: unidade.proprietario.id,
+          nome: unidade.proprietario.nome,
+          email: unidade.proprietario.email,
+          telefone: unidade.proprietario.telefone
+        }
+      };
+    });
+
+    res.json(respostaFormatada);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar unidades" });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar unidades com proprietários' });
   }
 });
 
