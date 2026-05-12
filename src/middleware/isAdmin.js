@@ -1,4 +1,5 @@
 module.exports = (req, res, next) => {
+  console.log("O QUE CHEGOU NO IS_ADMIN:", req.user);
   // O middleware de auth anterior já deve ter colocado o user na requisição
   if (req.user && req.user.role === 'ADMIN') {
     next(); // É admin, pode passar
