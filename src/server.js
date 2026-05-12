@@ -1,3 +1,9 @@
+if (process.env.NODE_ENV === 'production') {
+    try {
+        delete require.cache[require.resolve('@prisma/client')];
+    } catch (e) {}
+}
+
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
