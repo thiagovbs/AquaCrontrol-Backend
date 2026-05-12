@@ -81,6 +81,26 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
+router.patch('/:id/faturar', async (req, res) => {
+  const { id } = req.params;
+  const { valorTotal, statusPagamento } = req.body;
+
+  try {
+    const leituraFaturada = await prisma.leitura.update({
+      where: { id: Number(id) },
+      data: {
+        valorTotal: parseFloat(valorTotal),
+        statusPagamento: statusPagamento
+      }
+    });
+    
+    res.json(leituraFaturada);
+  } catch (error) {
+    console.error("Erro no faturamento:", error);
+    res.status(500).json({ error: "Erro ao processar faturamento" });
+  }
+});
+
 // Deletar leitura
 router.delete('/:id', auth, async (req, res) => {
   try {
