@@ -71,7 +71,13 @@ router.put('/:id', auth, async (req, res) => {
     });
     res.json(leitura);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao atualizar leitura" });
+    console.error("ERRO COMPLETO DO PRISMA:", error); // Olhe isso no log do Render
+    //res.status(500).json({ error: "Erro ao atualizar leitura" });
+    res.status(500).json({ 
+      error: "Erro ao atualizar leitura",
+      message: error.message, // Isso vai mostrar o erro real no seu navegador
+      code: error.code // O código do erro do Prisma (ex: P2025)
+    });
   }
 });
 
