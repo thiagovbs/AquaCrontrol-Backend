@@ -1,9 +1,0 @@
-postgresql://neondb_owner:npg_FvfGB05njVPO@ep-morning-surf-acwexqpq.sa-east-1.aws.neon.tech/neondb?sslmode=require
-
-
-
-Host: ep-morning-surf-acwexqpq.sa-east-1.aws.neon.tech
-Database: neondb
-Role: neondb_owner
-Password: npg_FvfGB05njVPO
-Pooler host: ep-morning-surf-acwexqpq-pooler.sa-east-1.aws.neon.tech
