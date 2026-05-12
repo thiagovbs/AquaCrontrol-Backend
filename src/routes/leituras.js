@@ -4,16 +4,21 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Listar todas as leituras
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const leituras = await prisma.leitura.findMany({
-      include: { unidade: true },
-      orderBy: [{ anoReferencia: 'desc' }, { mesReferencia: 'desc' }]
+      include: {
+        unidade: {
+          include: {
+            proprietario: true // Traz o dono junto
+          }
+        }
+      },
+      orderBy: { criadoEm: 'desc' } // As mais recentes primeiro
     });
     res.json(leituras);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar leituras" });
+    res.status(500).json({ error: 'Erro ao buscar leituras' });
   }
 });
 
