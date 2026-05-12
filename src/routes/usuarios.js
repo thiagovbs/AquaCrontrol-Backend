@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
-const prisma = new PrismaClient();
+
 
 // Listar usuários (Somente ADMIN deveria acessar, mas vamos simplificar)
 router.get('/', auth, async (req, res) => {
