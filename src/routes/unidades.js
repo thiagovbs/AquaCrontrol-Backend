@@ -3,6 +3,11 @@ const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
+// Autenticação exigida em todo este router. Declarar uma vez aqui, em vez de
+// repetir `auth` handler a handler, evita que um handler novo nasça aberto --
+// foi assim que GET /, PATCH /:id/faturar e GET /unidades ficaram sem proteção.
+router.use(auth);
+
 
 router.get('/', async (req, res) => {
   try {
@@ -47,7 +52,7 @@ router.get('/', async (req, res) => {
 });
 
 // Criar unidade vinculada a um proprietário
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   const { numero, bloco, proprietarioId } = req.body;
   try {
     const unidade = await prisma.unidade.create({
@@ -64,7 +69,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Atualizar unidade
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { numero, bloco, proprietarioId } = req.body;
   try {
     const unidade = await prisma.unidade.update({
@@ -82,7 +87,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Excluir unidade
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     await prisma.unidade.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ msg: "Unidade excluída" });

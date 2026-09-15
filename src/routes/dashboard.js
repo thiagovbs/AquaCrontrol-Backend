@@ -3,8 +3,13 @@ const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
+// Autenticação exigida em todo este router. Declarar uma vez aqui, em vez de
+// repetir `auth` handler a handler, evita que um handler novo nasça aberto --
+// foi assim que GET /, PATCH /:id/faturar e GET /unidades ficaram sem proteção.
+router.use(auth);
 
-router.get('/', auth, async (req, res) => {
+
+router.get('/', async (req, res) => {
   try {
     // Busca todas as leituras e traz junto os dados da unidade e do proprietário
     const leituras = await prisma.leitura.findMany({

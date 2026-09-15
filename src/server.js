@@ -17,7 +17,34 @@ const isAdmin = require('./middleware/isAdmin');
 const auth = require('./middleware/auth');
 
 const app = express();
-app.use(cors());
+
+// O CORS restritivo estava declarado DEPOIS das rotas e por isso nunca era
+// alcançado: para qualquer requisição que casasse com uma rota, o handler
+// respondia antes. O que valia era um app.use(cors()) aberto a qualquer
+// origem, e a allowlist abaixo era código morto.
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permite localhost (desenvolvimento) ou a URL que a Vercel vai nos dar.
+    // FRONTEND_URL pode não estar definida; filtrar evita um `undefined` na
+    // lista de origens permitidas.
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+
+    // Sem Origin são chamadas que não vêm de navegador — o app mobile e
+    // ferramentas como curl. Essas seguem autenticadas pelo Bearer token.
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // false apenas omite os cabeçalhos de CORS e o navegador bloqueia.
+      // Lançar um Error aqui viraria 500 no servidor, ruído sem ganho.
+      callback(null, false);
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 app.get('/ping', (req, res) => {
@@ -36,23 +63,6 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/config', auth, isAdmin, configRoutes);
 app.use('/api/usuarios', auth, isAdmin, usuarioRoutes);
 
-// Configuração do CORS para produção
-app.use(cors({
-  origin: (origin, callback) => {
-    // Permite localhost (desenvolvimento) ou a URL que a Vercel vai nos dar
-    const allowedOrigins = [
-      'http://localhost:5173', 
-      'http://localhost:3000',
-      process.env.FRONTEND_URL // Variável que definiremos no Render
-    ];
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Não permitido pelo CORS'));
-    }
-  },
-  credentials: true
-}));
 
 app.get('/', (req, res) => {
   res.json({ 

@@ -3,9 +3,14 @@ const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
+// Autenticação exigida em todo este router. Declarar uma vez aqui, em vez de
+// repetir `auth` handler a handler, evita que um handler novo nasça aberto --
+// foi assim que GET /, PATCH /:id/faturar e GET /unidades ficaram sem proteção.
+router.use(auth);
+
 
 // Listar todos os proprietários
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const proprietarios = await prisma.proprietario.findMany({
       include: { unidades: true } // Traz as unidades vinculadas junto
@@ -17,7 +22,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Criar proprietário
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   const { nome, telefone, email } = req.body;
   try {
     const novo = await prisma.proprietario.create({
@@ -31,7 +36,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Atualizar proprietário
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { nome, telefone, email } = req.body;
   try {
     const atualizado = await prisma.proprietario.update({
@@ -45,7 +50,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Deletar proprietário
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     await prisma.proprietario.delete({
       where: { id: parseInt(req.params.id) }

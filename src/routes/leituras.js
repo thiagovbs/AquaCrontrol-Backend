@@ -3,6 +3,11 @@ const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
+// Autenticação exigida em todo este router. Declarar uma vez aqui, em vez de
+// repetir `auth` handler a handler, evita que um handler novo nasça aberto --
+// foi assim que GET /, PATCH /:id/faturar e GET /unidades ficaram sem proteção.
+router.use(auth);
+
 
 router.get('/', async (req, res) => {
   try {
@@ -23,7 +28,7 @@ router.get('/', async (req, res) => {
 });
 
 // Criar nova leitura (Manual via Web)
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   const { unidadeId, mesReferencia, anoReferencia, leituraAnterior, leituraAtual, valorTotal, dataVencimento, statusPagamento } = req.body;
   
   const consumo = parseFloat(leituraAtual) - parseFloat(leituraAnterior);
@@ -50,7 +55,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Atualizar leitura (Ex: Mudar para PAGO ou corrigir medição)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { mesReferencia, anoReferencia, leituraAnterior, leituraAtual, valorTotal, dataVencimento, statusPagamento } = req.body;
   
   const consumo = parseFloat(leituraAtual) - parseFloat(leituraAnterior);
@@ -102,7 +107,7 @@ router.patch('/:id/faturar', async (req, res) => {
 });
 
 // Deletar leitura
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     await prisma.leitura.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ msg: "Leitura excluída" });
