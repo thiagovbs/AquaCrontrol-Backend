@@ -1,0 +1,39 @@
+# Dependências
+node_modules/
+
+# Variáveis de ambiente.
+# Um .env com DATABASE_URL e JWT_SECRET chegou a ser versionado no commit
+# inicial e removido depois, mas continua no histórico. O padrão abaixo cobre
+# as variações de nome usadas no projeto, incluindo ".env LOCAL".
+.env
+.env.*
+.env*
+!.env.example
+
+# Prisma: cliente gerado
+prisma/generated/
+.prisma/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Artefatos de build e cache
+dist/
+build/
+coverage/
+.cache/
+
+# Editor e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Chaves e certificados
+*.pem
+*.key
+*.p12
