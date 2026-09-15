@@ -1,20 +1,19 @@
+/**
+ * Autenticação.
+ *
+ * POST /register foi removido. Era público, aceitava `role` do corpo e o
+ * schema tinha @default(ADMIN): um POST sem autenticação nenhuma criava um
+ * administrador. Não era chamado por frontend nem mobile, e POST /api/usuarios
+ * (protegido por auth + isAdmin) já cobre a criação de usuários. O primeiro
+ * administrador de um ambiente novo vem de `npm run seed`.
+ */
+
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../lib/prisma');
+const { JWT_SECRET } = require('../config');
 const router = express.Router();
-
-router.post('/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
-  try {
-    let user = await prisma.user.findUnique({ where: { email } });
-    if (user) return res.status(400).json({ msg: 'Usuário já existe' });
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    user = await prisma.user.create({ data: { name, email, password: hashedPassword, role } });
-    res.status(201).json({ msg: 'Usuário registrado com sucesso' });
-  } catch (err) { res.status(500).send('Erro no servidor'); }
-});
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -24,7 +23,7 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Credenciais inválidas' });
     const payload = { user: { id: user.id, role: user.role } };
-    jwt.sign(payload, process.env.JWT_SECRET || 'secreta123', { expiresIn: 3600 }, (err, token) => {
+    jwt.sign(payload, JWT_SECRET, { expiresIn: 3600 }, (err, token) => {
       if (err) throw err;
       res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
     });

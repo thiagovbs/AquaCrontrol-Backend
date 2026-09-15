@@ -4,8 +4,12 @@ const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
+// Espelha o enum Role do schema. Sem isto, um valor fora do enum vira exceção
+// do Prisma e chega ao cliente como 500.
+const PAPEIS = ['ADMIN', 'LEITURISTA'];
 
-// Listar usuários (Somente ADMIN deveria acessar, mas vamos simplificar)
+
+// Listar usuários. O isAdmin é aplicado no server.js, sobre todo o /api/usuarios.
 router.get('/', auth, async (req, res) => {
   try {
     const usuarios = await prisma.user.findMany({
@@ -20,11 +24,26 @@ router.get('/', auth, async (req, res) => {
 // Criar/Atualizar via Painel
 router.post('/', auth, async (req, res) => {
   const { name, email, password, role } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios." });
+  }
+  if (!PAPEIS.includes(role)) {
+    return res.status(400).json({ error: `Papel inválido. Use um de: ${PAPEIS.join(', ')}.` });
+  }
+
   try {
+    // O e-mail é @unique: sem esta checagem a colisão estoura a constraint e
+    // vira 500, quando o cliente precisa de um 409.
+    const emailEmUso = await prisma.user.findUnique({ where: { email } });
+    if (emailEmUso) {
+      return res.status(409).json({ error: "Já existe um usuário com este e-mail." });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
-    const user = await prisma.user.create({
+
+    await prisma.user.create({
       data: { name, email, password: hashedPassword, role }
     });
     res.status(201).json({ msg: "Usuário criado com sucesso" });
@@ -35,6 +54,11 @@ router.post('/', auth, async (req, res) => {
 
 router.put('/:id', auth, async (req, res) => {
   const { name, email, password, role } = req.body;
+
+  if (role !== undefined && !PAPEIS.includes(role)) {
+    return res.status(400).json({ error: `Papel inválido. Use um de: ${PAPEIS.join(', ')}.` });
+  }
+
   try {
     let updateData = { name, email, role };
     
