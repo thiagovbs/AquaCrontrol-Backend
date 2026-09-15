@@ -1,7 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const prisma = require('../lib/prisma');
-const auth = require('../middleware/auth');
+// A autenticação e o isAdmin deste router são declarados na montagem, em
+// server.js: app.use('/api/usuarios', auth, isAdmin, usuarioRoutes). Repetir
+// `auth` por handler faria o token ser verificado duas vezes por requisição.
 const router = express.Router();
 
 // Espelha o enum Role do schema. Sem isto, um valor fora do enum vira exceção
@@ -10,7 +12,7 @@ const PAPEIS = ['ADMIN', 'LEITURISTA'];
 
 
 // Listar usuários. O isAdmin é aplicado no server.js, sobre todo o /api/usuarios.
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const usuarios = await prisma.user.findMany({
       select: { id: true, name: true, email: true, role: true } // Não retornamos a senha!
@@ -22,7 +24,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Criar/Atualizar via Painel
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   const { name, email, password, role } = req.body;
 
   if (!name || !email || !password) {
@@ -52,7 +54,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { name, email, password, role } = req.body;
 
   if (role !== undefined && !PAPEIS.includes(role)) {
@@ -78,7 +80,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     await prisma.user.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ msg: "Usuário deletado" });
